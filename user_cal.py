@@ -12,17 +12,25 @@ class User:
         self.channel_vect = np.zeros((para.tx_ma_num),dtype=np.complex128)
         self.AWGN = np.sqrt(para.variance_watt/2) * (np.random.randn() + 1j * np.random.randn())
 
+        self.reciev_pow = 0
+
         for i in range(para.channel_path_num):
             self.path_gain[i] = np.sqrt(self.path_gain_var/2) * (np.random.randn() + 1j * np.random.randn())
-
+    
+    def set_FRVs_usr(self, para):
         for row in range(para.channel_path_num):
             for col in range(para.tx_ma_num):
                 self.FRVs_usr[row][col] = np.exp(1j * (2 * np.pi / para.lamda) * para.tx_ma_array[col] * np.cos(self.angle[row]))
                 #untranspose
-        
+
+    def set_channel_vect(self, para):    
         for i in range(para.channel_path_num):
             self.channel_vect += self.path_gain[i]*self.FRVs_usr[i]
             #untranspose
+    
+    def update(self, para):
+        self.set_FRVs_usr(para)
+        self.set_channel_vect(para)
         
     def set_data_rate(self, data_rate):
         self.data_rate = data_rate
@@ -42,7 +50,3 @@ class User:
 
     def get_harvest_pow(self):
         return self.harvest_pow
-
-
-'''m=User()
-print(m.channel_vect)'''

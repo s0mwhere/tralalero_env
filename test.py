@@ -1,24 +1,20 @@
-import numpy as np
-from base_enviroment import base_station
+from enviroment import base_station
+import gymnasium as gym
+from parameter import Para
 
-class M:
-    def __init__(self):
-        self.a=1
+para = Para()
 
-m = M()
+#env = gym.make("LunarLander-v3", render_mode="human")
+env = base_station(para)
+episodes = 50
 
-class L:
-    def __init__(self, m):
-        self.a = m.a
-
-class n:
-    def __init__(self):
-        self.m = m
-        self.l =L(m)
-    def changem(self):
-        self.m.a = 2
-
-test = n()
-print(test.l.a)
-test.changem()
-print(test.l.a)
+for episode in range(episodes):
+	terminated =False
+	truncated = False
+	obs, info = env.reset()
+	while not terminated and not truncated:#not done:
+		random_action = env.action_space.sample()
+		print("action",random_action)
+		#print(env.step(random_action))
+		obs, reward, terminated, truncated, info = env.step(random_action)
+		print('obs', env.obs_tx_ma_array)
