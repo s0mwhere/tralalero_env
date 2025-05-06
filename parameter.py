@@ -10,9 +10,11 @@ class Para:
     segment_length = 10*lamda
     do_min_dist = lamda/2
 
-    tx_ma_array = np.zeros((tx_ma_num,))
+    default_tx_ma_array = np.zeros((tx_ma_num,))
     for i in range(tx_ma_num):
-        tx_ma_array[i]=(segment_length/tx_ma_num)*i
+        default_tx_ma_array[i]=(segment_length/tx_ma_num)*i
+
+    tx_ma_array = default_tx_ma_array.copy()
 
     beamform_array = np.zeros((tx_ma_num, comn_usr_num + 1), dtype=np.complex128)
     rx_posit = np.random.uniform(low=0, high=segment_length)
@@ -34,7 +36,8 @@ class Para:
     const_g = 0.3
     const_y2 = 1/(1+np.exp(const_y*const_g))
 
-    E_min = -20 #dBm
+    E_min_dbm = -20 #dBm
+    E_min_watt = dbm_watt(E_min_dbm)
 
     d_max = 100
     d_min = 25
@@ -52,6 +55,7 @@ class Para:
 
     variance_watt = dbm_watt(variance_dbm)
     std_po_watt = dbm_watt(std_po_dbm)
+    SCNR_min_watt = dbm_watt(SCNR_min_dbm)
     light_spd = 3e8
 
     
