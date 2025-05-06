@@ -34,6 +34,8 @@ class base_station(gym.Env):
         array_recieve = []
         for usr in self.userlist:
             array_recieve.append(usr.get_reciev_pow())
+        
+        #get SCNR
         scnr = np.array((self.SCNR))
         return ({
             "Current Antenna array position":np.array(self.obs_tx_ma_array, dtype=np.double),
@@ -44,17 +46,17 @@ class base_station(gym.Env):
 
     
     def reset(self, seed=None, options=None):
-        self.terminated = False
-        self.truncated = False
-        self.steep = 0
-        self.SCNR = 0
+        self.steep = 0  #for testing only
 
+    #reset action
+        self.SCNR = 0 #needed for first obs
         self.split_fact = np.random.uniform(low=0, high=np.pi)
         self.para.tx_ma_array = self.para.default_tx_ma_array.copy()
 
         self.beamform_array = np.random.randn(self.para.tx_ma_num, self.para.comn_usr_num+1) + 1j * np.random.randn(self.para.tx_ma_num, self.para.comn_usr_num+1)
         self.beamform_array = self.beamform_array / np.linalg.norm(self.beamform_array, 'fro') * np.sqrt(self.para.std_po_watt)
 
+    #reset entity
         self.userlist = []
         for _ in range(self.para.comn_usr_num):
             self.userlist.append(User(self.para))
@@ -194,7 +196,7 @@ class base_station(gym.Env):
         
 
         #for testing purpose only
-        self.steep += 1
-        if self.steep >= 10: terminated = True
+        #self.steep += 1
+        #if self.steep >= 10: terminated = True
         
         return observation, reward, terminated, truncated, info
