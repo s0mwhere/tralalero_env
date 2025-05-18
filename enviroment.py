@@ -135,7 +135,7 @@ class base_station(gym.Env):
 
         for i in range(self.para.comn_usr_num):
             self.SCNR_denom1 += (np.linalg.norm(np.dot((self.target.channel_modl.conj()), 
-                                                    (self.beamform_array[:][n]).reshape(self.para.comn_usr_num+1, 1))))**2
+                                                    (self.beamform_array[:][i]).reshape(self.para.comn_usr_num+1, 1))))**2
 
         for i in range(self.para.clutter_num):
             for n in range(self.para.comn_usr_num+1):
@@ -194,9 +194,97 @@ class base_station(gym.Env):
         observation = self.get_obs()
         info = {}
         
-
+        self.export_data_matlab()
         #for testing purpose only
         #self.steep += 1
         #if self.steep >= 10: terminated = True
         
         return observation, reward, terminated, truncated, info
+    
+    def export_data_matlab(self):
+        # create file
+        data_file = open("enviroment_data.txt", "a")
+
+        # write out data of users
+        """
+        user content including:
+            Distance 
+            number of path propagation
+            Angle of direction array
+
+        """
+        # content
+        user_counter = 0
+        for usr in self.userlist:
+            user_counter += 1
+            de_string="usr"+str(user_counter)+"_distance="+str(usr.distance)+";\nusr"+str(user_counter)+"_num_path="+str(self.para.channel_path_num)+";\nusr"+str(user_counter)+"_AoD=["
+            for angle in usr.angle:
+                de_string += str(angle)
+                if(angle!= usr.angle[-1]):
+                    de_string += ','
+            de_string +="];\nusr"+str(user_counter)+"_path_gain_distribution=["
+            for gain in usr.path_gain:
+                de_string += str(gain)
+                if(gain!= usr.path_gain[-1]):
+                    de_string+=','
+            de_string +="];\n"
+            data_file.write(de_string)
+            break           
+
+
+        de_string = "targ1_AoD=" + str(self.target.angle)+';\n'
+        de_string +="targ1_atten_coeff=" + str(self.target.atten_coeff)+';\n'
+        de_string +="targ1_doppler_freq=" + str(self.target.atten_coeff)+';\n'
+        de_string +="targ1_rx_posit=" + str(self.target.rx_posit)+';\n'
+        de_string +="sampling_period =" + str(self.para.sampling_period)+';\n'
+        de_string +='clut_channel_modl=['
+        for i in range(2):
+            for n in self.clutrlist[i].channel_modl:
+                de_string += str(n)+','
+            de_string += ';'
+        de_string += '];\n'
+        data_file.write(de_string)
+
+        
+
+        # export system, data
+        """
+        System data including:
+            tx antenna array
+            beamforming matrix
+
+        """
+        
+        action_string = "antenna_array=["
+        for act in self.para.tx_ma_array:
+            action_string += str(act)
+            if(act!=self.para.tx_ma_array[-1]):
+                action_string+=','
+        action_string += "];\nbeam_matrix =["
+        for m in self.beamform_array:
+            action_string += ';'
+            for n in m:
+                action_string += str(n)
+                if(n != self.beamform_array[-1][-1]):
+                    action_string += ','
+        action_string += '];\n'+'split_fact = '+str(self.split_fact)+';\n\n'
+        data_file.write(action_string)
+
+        """
+        calculated datas:
+            Max channel gain
+            Array response vector 
+            Channel vector
+
+            sum data rate
+        """
+        for usr in self.userlist:
+            de_string = ("Max Channel gain="+str(usr.path_gain_var)+
+                            "\nUser array response vector: \n"+str(usr.FRVs_usr)+
+                            "\nChannel Array: "+str(usr.channel_vect)+
+                            "\ndata rate: "+str(usr.data_rate)+
+                            '\nSCNR: '+str(self.SCNR))
+            data_file.write(de_string)
+            break
+        data_file.write("\ncal Beam Power: "+str(self.beam_power))
+        data_file.close()

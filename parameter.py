@@ -60,7 +60,3 @@ class Para:
 
     
     pass
-
-
-#m=para()
-#print(m.carrier_freq)
