@@ -1,8 +1,11 @@
 from enviroment import base_station
 import gymnasium as gym
+from parameter import Para
+
+para = Para()
 
 #env = gym.make("LunarLander-v3", render_mode="human")
-env = base_station()
+env = base_station(para)
 
 episodes = 50
 for episode in range(episodes):

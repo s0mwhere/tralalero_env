@@ -14,8 +14,6 @@ class Para:
     for i in range(tx_ma_num):
         default_tx_ma_array[i]=(segment_length/tx_ma_num)*i
 
-    tx_ma_array = default_tx_ma_array.copy() #active
-
     beamform_array = np.zeros((tx_ma_num, comn_usr_num + 1), dtype=np.complex128)
     rx_posit = np.random.uniform(low=0, high=segment_length)
 

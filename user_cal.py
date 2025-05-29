@@ -17,10 +17,10 @@ class User:
         for i in range(para.channel_path_num):
             self.path_gain[i] = np.sqrt(self.path_gain_var/2) * (np.random.randn() + 1j * np.random.randn())
     
-    def set_FRVs_usr(self, para):
+    def set_FRVs_usr(self, para, tx_ma_array):
         for row in range(para.channel_path_num):
             for col in range(para.tx_ma_num):
-                self.FRVs_usr[row][col] = np.exp(1j * (2 * np.pi / para.lamda) * para.tx_ma_array[col] * np.cos(self.angle[row]))
+                self.FRVs_usr[row][col] = np.exp(1j * (2 * np.pi / para.lamda) * tx_ma_array[col] * np.cos(self.angle[row]))
                 #untranspose
 
     def set_channel_vect(self, para):    
@@ -28,8 +28,8 @@ class User:
             self.channel_vect += self.path_gain[i]*self.FRVs_usr[i]
             #untranspose
     
-    def update(self, para):
-        self.set_FRVs_usr(para)
+    def update(self, para, tx_ma_array):
+        self.set_FRVs_usr(para, tx_ma_array)
         self.set_channel_vect(para)
         
     def set_data_rate(self, data_rate):
