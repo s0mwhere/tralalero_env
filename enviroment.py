@@ -22,7 +22,7 @@ class base_station(gym.Env):
                                            shape=((self.para.tx_ma_num+
                                                    (self.para.tx_ma_num * (self.para.comn_usr_num+1)) * 2+1),))
         
-        self.export_data_flag = 1
+        self.export_data_flag = 0 #1-no export   0-export
     
     def get_obs(self):
         # Get current action parameters
@@ -136,17 +136,17 @@ class base_station(gym.Env):
         self.SCNR_denom2 = 0
 
         self.SCNR_numer = (np.linalg.norm(np.dot((self.target.channel_modl.conj()), 
-                                                    (self.beamform_array[:][self.para.comn_usr_num]).reshape(self.para.comn_usr_num+1, 1))))**2
+                                                    (self.beamform_array[:,self.para.comn_usr_num]).reshape(self.para.comn_usr_num+1, 1))))**2
                                                                         #k+1 -> k
 
         for i in range(self.para.comn_usr_num):
             self.SCNR_denom1 += (np.linalg.norm(np.dot((self.target.channel_modl.conj()), 
-                                                    (self.beamform_array[:][i]).reshape(self.para.comn_usr_num+1, 1))))**2
+                                                    (self.beamform_array[:,i]).reshape(self.para.comn_usr_num+1, 1))))**2
 
         for i in range(self.para.clutter_num):
             for n in range(self.para.comn_usr_num+1):
                 self.SCNR_denom2 += (np.linalg.norm(np.dot((self.clutrlist[i].channel_modl.conj()), 
-                                                    (self.beamform_array[:][n]).reshape(self.para.comn_usr_num+1, 1))))**2
+                                                    (self.beamform_array[:,n]).reshape(self.para.comn_usr_num+1, 1))))**2
                 
         self.SCNR = self.SCNR_numer/(self.SCNR_denom1+self.SCNR_denom2+self.para.variance_watt)
 
