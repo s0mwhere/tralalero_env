@@ -113,7 +113,7 @@ eval_callback = EvalCallback(env, best_model_save_path=models_dir,
 model = PPO('MultiInputPolicy', env, verbose=1, tensorboard_log=logdir, ent_coef=0.01, gamma=0.95)
 #model = PPO.load(model_path, env=env)
 
-TIMESTEPS = 100000
+TIMESTEPS = 500000
 model.learn(total_timesteps=TIMESTEPS, callback=TensorboardCallback(), tb_log_name="PPO")
 
 env.close()

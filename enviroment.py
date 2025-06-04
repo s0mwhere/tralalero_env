@@ -22,7 +22,7 @@ class base_station(gym.Env):
                                            shape=((self.para.tx_ma_num+
                                                    (self.para.tx_ma_num * (self.para.comn_usr_num+1)) * 2+1),))
         
-        self.export_data_flag = 0 #1-no export   0-export
+        self.export_data_flag = 1 #1-no export   0-export
     
     def get_obs(self):
         # Get current action parameters
@@ -79,21 +79,13 @@ class base_station(gym.Env):
 
         #---modify and apply action--
         #antena array
-        for i in range(self.para.tx_ma_num):
-            if tx_ma_adjust[i] >= 0 and self.tx_ma_array[i] <= self.para.segment_length-0.01: self.tx_ma_array[i] += 0.01
-            elif self.tx_ma_array[i]>=0.01: self.tx_ma_array[i] -= 0.01
+        self.tx_ma_array = (tx_ma_adjust+1)/2
 
         #beam forming matrix
-        self.beamforming_matrix = np.array(beamforming_real_part + beamforming_img_part*1j).reshape(self.para.tx_ma_num, self.para.comn_usr_num+1)
-
-        for i in range(self.para.tx_ma_num):
-            for n in range(self.para.comn_usr_num+1):
-                if self.beamforming_matrix[i][n] >= 1: self.beamform_array[i][n] += 0.01
-                else: self.beamform_array[i][n] -= 0.01
+        self.beamform_array = np.array(beamforming_real_part + beamforming_img_part*1j).reshape(self.para.tx_ma_num, self.para.comn_usr_num+1)
 
         #split factor
-        if action[-1] >= 0: self.split_fact += 0.01
-        else: self.split_fact -= 0.01
+        self.split_fact = (action[-1]+1)/2
 
         #--update entity (FRVs and channel vect)--
         for i in range(self.para.comn_usr_num):
@@ -205,7 +197,7 @@ class base_station(gym.Env):
         if not terminated:
             reward += self.sum_data_rate*10
         else:
-            reward = -penalty*1000
+            reward = -penalty*10
 
         self.reward = reward.real
         self.terminated = terminated
