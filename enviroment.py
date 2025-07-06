@@ -155,8 +155,8 @@ class base_station(gym.Env):
             self.userlist[i].set_harvest_pow(self.harvest_pow)
 
         #--checking stage--
-        terminated = False
-        truncated = False
+        terminated = True
+        truncated = True
         self.reward = 0
         reward = 0
         penalty = 0
@@ -167,14 +167,12 @@ class base_station(gym.Env):
         self.beam_power = self.beam_power.real
         if self.beam_power > self.para.std_po_watt:
             penalty += self.beam_power - self.para.std_po_watt
-            terminated = True
         else:
             reward += 1
 
         #check SCNR threshold
         if self.SCNR < self.para.SCNR_min_watt:
             penalty += self.para.SCNR_min_watt - self.SCNR
-            terminated = True
         else:
             reward += 1
 
@@ -182,7 +180,6 @@ class base_station(gym.Env):
         for usr in self.userlist:
             if usr.get_harvest_pow() < self.para.E_min_watt:
                 penalty += self.para.E_min_watt - usr.get_harvest_pow()
-                terminated = True
             else:
                 reward += 1
 
@@ -190,14 +187,13 @@ class base_station(gym.Env):
         for i in range(self.para.tx_ma_num-1):
             if abs(self.tx_ma_array[i] - self.tx_ma_array[i+1]) < self.para.do_min_dist:
                 penalty += 1
-                terminated = True
             else:
                 reward += 1
 
-        if not terminated:
-            reward += self.sum_data_rate*10
-        else:
+        if penalty:
             reward = -penalty*10
+        else:
+            reward += self.sum_data_rate*10
 
         self.reward = reward.real
         self.terminated = terminated
