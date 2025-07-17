@@ -4,3 +4,9 @@ models
 check_env.py
 test.py
 enviroment_data.txt
+__pycache__/base_enviroment.cpython-312.pyc
+__pycache__/clutter_cal.cpython-312.pyc
+__pycache__/enviroment.cpython-312.pyc
+__pycache__/parameter.cpython-312.pyc
+__pycache__/target_cal.cpython-312.pyc
+__pycache__/user_cal.cpython-312.pyc
